@@ -1,9 +1,13 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
-WORKDIR /app
+# Activer mod_rewrite (optionnel mais utile)
+RUN a2enmod rewrite
 
-COPY . .
+# Copier tous les fichiers dans Apache
+COPY . /var/www/html/
 
-EXPOSE 10000
+# Donner les permissions
+RUN chown -R www-data:www-data /var/www/html
 
-CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
+# Exposer le port
+EXPOSE 80
