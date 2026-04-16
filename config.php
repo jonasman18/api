@@ -1,9 +1,11 @@
 <?php
-$host = 'localhost';
-$db = 'visiteurs_db';
+$host = 'maglev.proxy.rlwy.net';
+$port = '18393';
+$db = 'railway';
 $user = 'root';
-$pass = '';
-$dsn = "mysql:host=$host;dbname=$db;charset=utf8";
+$pass = 'UPIkpSmNXtkeJdrgceOWFkfObvTiDHxs';
+
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8";
 
 try {
     $pdo = new PDO($dsn, $user, $pass);
