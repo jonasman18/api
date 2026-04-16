@@ -4,46 +4,53 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Connexion à la base de données
-$conn = new mysqli("localhost", "root", "", "visiteurs_db");
-if ($conn->connect_error) {
-    echo json_encode(["success" => false, "message" => "Erreur de connexion à la base"]);
+// 🔥 CONNEXION RAILWAY
+$host = 'maglev.proxy.rlwy.net';
+$port = '18393';
+$dbname = 'railway';
+$username = 'root';
+$password = 'UPIkpSmNXtkeJdrgceOWFkfObvTiDHxs';
+
+try {
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    echo json_encode(["success" => false, "message" => "Erreur connexion DB"]);
     exit;
 }
 
-// Récupération des données JSON envoyées depuis React
+// 🔷 Récupération JSON
 $data = json_decode(file_get_contents("php://input"), true);
 
 $nom = trim($data['nom'] ?? '');
 $email = trim($data['email'] ?? '');
-$password = $data['password'] ?? '';
+$pass = $data['password'] ?? '';
 
-// Validation simple
-if (empty($nom) || empty($email) || empty($password)) {
+// 🔷 Validation
+if (empty($nom) || empty($email) || empty($pass)) {
     echo json_encode(["success" => false, "message" => "Tous les champs sont obligatoires"]);
     exit;
 }
 
-// Vérifier si l'e-mail est déjà utilisé
-$stmt = $conn->prepare("SELECT id FROM utilisateurs WHERE email = ?");
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$stmt->store_result();
+// 🔷 Vérifier email existant
+$stmt = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
+$stmt->execute([$email]);
 
-if ($stmt->num_rows > 0) {
+if ($stmt->rowCount() > 0) {
     echo json_encode(["success" => false, "message" => "Cet email est déjà utilisé"]);
     exit;
 }
 
-// Hasher le mot de passe
-$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+// 🔷 Hash password
+$hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
-// Insertion de l'utilisateur
-$stmt = $conn->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)");
-$stmt->bind_param("sss", $nom, $email, $hashed_password);
+// 🔷 Insertion
+$stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)");
+$success = $stmt->execute([$nom, $email, $hashed_password]);
 
-if ($stmt->execute()) {
+if ($success) {
     echo json_encode(["success" => true, "message" => "Inscription réussie"]);
 } else {
     echo json_encode(["success" => false, "message" => "Erreur lors de l'inscription"]);
 }
+?>

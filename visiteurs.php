@@ -2,23 +2,23 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-header("Access-Control-Allow-Headers: Origin, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Headers: Origin, Content-Type, Authorization, X-Requested-With");
 
-// Connexion PDO
-$host = 'localhost';
-$dbname = 'visiteurs_db'; 
+// 🔥 CONNEXION RAILWAY
+$host = 'maglev.proxy.rlwy.net';
+$port = '18393';
+$dbname = 'railway';
 $username = 'root';
-$password = ''; 
+$password = 'UPIkpSmNXtkeJdrgceOWFkfObvTiDHxs';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     echo json_encode(['error' => 'Erreur de connexion : ' . $e->getMessage()]);
     exit;
 }
 
-// Méthode de requête
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -28,7 +28,7 @@ if ($method === 'GET') {
 
 } elseif ($method === 'POST') {
     $data = json_decode(file_get_contents("php://input"), true);
-    
+
     if (isset($data['nom'], $data['nombre_jours'], $data['tarif_journalier'])) {
         $stmt = $pdo->prepare("INSERT INTO visiteurs (nom, nombre_jours, tarif_journalier) VALUES (?, ?, ?)");
         $stmt->execute([$data['nom'], $data['nombre_jours'], $data['tarif_journalier']]);

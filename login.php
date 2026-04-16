@@ -8,28 +8,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-// Connexion à la base avec PDO
+
+// 🔥 CONNEXION RAILWAY
+$host = 'maglev.proxy.rlwy.net';
+$port = '18393';
+$dbname = 'railway';
+$username = 'root';
+$password = 'UPIkpSmNXtkeJdrgceOWFkfObvTiDHxs';
+
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=visiteurs_db;charset=utf8", "root", "", [
+    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 } catch (PDOException $e) {
-    echo json_encode(["success" => false, "message" => "Erreur de connexion à la base"]);
+    echo json_encode(["success" => false, "message" => "Erreur connexion DB"]);
     exit;
 }
 
-// Récupération des données JSON
+// 🔷 Récupération JSON
 $data = json_decode(file_get_contents("php://input"), true);
 $email = trim($data['email'] ?? '');
-$password = $data['password'] ?? '';
+$pass = $data['password'] ?? '';
 
-// Validation des champs
-if (empty($email) || empty($password)) {
+// 🔷 Validation
+if (empty($email) || empty($pass)) {
     echo json_encode(["success" => false, "message" => "Champs requis"]);
     exit;
 }
 
-// Requête préparée pour récupérer l'utilisateur
+// 🔷 Requête utilisateur
 $stmt = $pdo->prepare("SELECT nom, mot_de_passe FROM utilisateurs WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -39,9 +46,16 @@ if (!$user) {
     exit;
 }
 
-// Vérification du mot de passe
-if (password_verify($password, $user['mot_de_passe'])) {
-    echo json_encode(["success" => true, "nom" => $user['nom']]);
+// 🔷 Vérification password
+if (password_verify($pass, $user['mot_de_passe'])) {
+    echo json_encode([
+        "success" => true,
+        "nom" => $user['nom']
+    ]);
 } else {
-    echo json_encode(["success" => false, "message" => "Mot de passe incorrect"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Mot de passe incorrect"
+    ]);
 }
+?>
