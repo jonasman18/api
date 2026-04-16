@@ -1,13 +1,15 @@
 FROM php:8.2-apache
 
-# Activer mod_rewrite (optionnel mais utile)
+# Installer extensions MySQL
+RUN docker-php-ext-install pdo pdo_mysql mysqli
+
+# Activer mod_rewrite
 RUN a2enmod rewrite
 
-# Copier tous les fichiers dans Apache
+# Copier le projet
 COPY . /var/www/html/
 
-# Donner les permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Exposer le port
 EXPOSE 80
