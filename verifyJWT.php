@@ -27,9 +27,8 @@ function requireAuth(): array {
 
     $token = substr($authHeader, 7);
 
-    $publicKeyRaw = getenv('JWT_PUBLIC_KEY');
-    $publicKey = str_replace(['\\n', '\n'], "\n", $publicKeyRaw);
-
+   $publicKey = base64_decode(getenv('JWT_PUBLIC_KEY_B64'));
+   
     if (empty($publicKey)) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Clé publique non configurée']);
