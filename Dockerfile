@@ -3,7 +3,7 @@ FROM php:8.2-apache
 RUN apt-get update && apt-get install -y \
     libzip-dev zip unzip curl \
     && docker-php-ext-install pdo pdo_mysql mysqli \
-    && a2enmod rewrite \
+    && a2enmod rewrite headers \
     && apt-get clean
 
 RUN curl -sS https://getcomposer.org/installer | php -- \
