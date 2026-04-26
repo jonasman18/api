@@ -5,10 +5,21 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 function requireAuth(): array {
-    $headers = getallheaders();
-    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
 
-    if (!str_starts_with($authHeader, 'Bearer ')) {
+    // ✅ Apache ne transmet pas toujours Authorization via getallheaders()
+    // On lit depuis $_SERVER directement
+    $authHeader = '';
+
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+    }
+
+    if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Token manquant']);
         exit;
@@ -16,8 +27,8 @@ function requireAuth(): array {
 
     $token = substr($authHeader, 7);
 
-    // ✅ Lire depuis variable d'environnement (pas depuis fichier)
-    $publicKey = str_replace('\n', "\n", getenv('JWT_PUBLIC_KEY'));
+    $publicKeyRaw = getenv('JWT_PUBLIC_KEY');
+    $publicKey = str_replace(['\\n', '\n'], "\n", $publicKeyRaw);
 
     if (empty($publicKey)) {
         http_response_code(500);
@@ -30,7 +41,7 @@ function requireAuth(): array {
         return (array) $decoded;
     } catch (Exception $e) {
         http_response_code(401);
-        echo json_encode(['success' => false, 'message' => 'Token invalide ou expiré']);
+        echo json_encode(['success' => false, 'message' => 'Token invalide : ' . $e->getMessage()]);
         exit;
     }
 }
