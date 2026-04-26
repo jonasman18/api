@@ -1,8 +1,13 @@
 {
     "require": {
-        "firebase/php-jwt": "^6.10"
+        "firebase/php-jwt": "^7.0"
     },
     "config": {
-        "optimize-autoloader": true
+        "audit": {
+            "abandoned": "ignore"
+        },
+        "platform": {
+            "php": "8.2"
+        }
     }
 }
