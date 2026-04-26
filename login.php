@@ -62,7 +62,9 @@ if (!password_verify($pass, $user['mot_de_passe'])) {
 }
 
 // ✅ Lire la clé privée depuis les variables d'environnement Render
-$privateKey = str_replace('\n', "\n", getenv('JWT_PRIVATE_KEY'));
+$privateKeyRaw = getenv('JWT_PRIVATE_KEY');
+$privateKey = str_replace(['\\n', '\n', ' '], ["\n", "\n", "\n"], $privateKeyRaw);
+$privateKey = trim($privateKey);
 
 if (empty($privateKey)) {
     http_response_code(500);
