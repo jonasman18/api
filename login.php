@@ -1,6 +1,4 @@
-<?php
-echo file_get_contents(__FILE__);
-exit;
+<?php  // ← AJOUTE CETTE LIGNE TOUT EN HAUT
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Firebase\JWT\JWT;
