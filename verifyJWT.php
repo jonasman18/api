@@ -5,7 +5,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 function requireAuth(): array {
-    $publicKey = file_get_contents('/etc/secrets/jwt_public.pem');
+    $publicKey = str_replace('\n', "\n", getenv('JWT_PUBLIC_KEY'));
 
     $headers = getallheaders();
     $authHeader = $headers['Authorization'] ?? '';

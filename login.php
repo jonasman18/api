@@ -64,8 +64,8 @@ if (!password_verify($pass, $user['mot_de_passe'])) {
 }
 
 // ✅ Génération du JWT RS256
-$privateKey = file_get_contents('/etc/secrets/jwt_private.pem');
 
+$privateKey = str_replace('\n', "\n", getenv('JWT_PRIVATE_KEY'));
 $payload = [
     'iss'  => 'visiteur-api',
     'aud'  => 'visiteur-app',
