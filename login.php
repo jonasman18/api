@@ -63,14 +63,21 @@ if (!password_verify($pass, $user['mot_de_passe'])) {
     exit;
 }
 
-// ✅ Génération du JWT RS256
-
+// ✅ Lire la clé privée depuis les variables d'environnement Render
 $privateKey = str_replace('\n', "\n", getenv('JWT_PRIVATE_KEY'));
+
+if (empty($privateKey)) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "Clé JWT non configurée"]);
+    exit;
+}
+
+// ✅ Génération du JWT RS256
 $payload = [
     'iss'  => 'visiteur-api',
     'aud'  => 'visiteur-app',
     'iat'  => time(),
-    'exp'  => time() + (8 * 3600),   // 8h
+    'exp'  => time() + (8 * 3600),
     'sub'  => $user['id'],
     'nom'  => $user['nom'],
     'role' => $user['role'] ?? 'agent',
