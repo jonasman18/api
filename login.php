@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// 🔥 CONNEXION RAILWAY
+//  CONNEXION RAILWAY
 $host     = 'maglev.proxy.rlwy.net';
 $port     = '18393';
 $dbname   = 'railway';
@@ -31,7 +31,7 @@ try {
     exit;
 }
 
-// 🔷 Récupération JSON
+//  Récupération JSON
 $data  = json_decode(file_get_contents("php://input"), true);
 $email = trim($data['email'] ?? '');
 $pass  = $data['password'] ?? '';
@@ -43,7 +43,7 @@ if (empty($email) || empty($pass)) {
     exit;
 }
 
-// 🔷 Requête utilisateur
+//  Requête utilisateur
 $stmt = $pdo->prepare("SELECT id, nom, mot_de_passe, role FROM utilisateurs WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -61,7 +61,7 @@ if (!password_verify($pass, $user['mot_de_passe'])) {
     exit;
 }
 
-// ✅ Lire la clé privée depuis les variables d'environnement Render
+//  Lire la clé privée depuis les variables d'environnement Render
 //$privateKey = str_replace('\n', "\n", getenv('JWT_PRIVATE_KEY'));
 $privateKey = base64_decode(getenv('JWT_PRIVATE_KEY_B64'));
 
@@ -71,12 +71,12 @@ if (empty($privateKey)) {
     exit;
 }
 
-// ✅ Génération du JWT RS256
+//  Génération du JWT RS256
 $payload = [
     'iss'  => 'visiteur-api',
     'aud'  => 'visiteur-app',
     'iat'  => time(),
-    'exp'  => time() + (8 * 3600),
+    'exp'  => time() + (1 * 60),
     'sub'  => $user['id'],
     'nom'  => $user['nom'],
     'role' => $user['role'] ?? 'agent',

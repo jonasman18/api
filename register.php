@@ -17,20 +17,20 @@ try {
     exit;
 }
 
-// 🔷 Récupération JSON
+//  Récupération JSON
 $data = json_decode(file_get_contents("php://input"), true);
 
 $nom = trim($data['nom'] ?? '');
 $email = trim($data['email'] ?? '');
 $pass = $data['password'] ?? '';
 
-// 🔷 Validation
+//  Validation
 if (empty($nom) || empty($email) || empty($pass)) {
     echo json_encode(["success" => false, "message" => "Tous les champs sont obligatoires"]);
     exit;
 }
 
-// 🔷 Vérifier email existant
+//  Vérifier email existant
 $stmt = $pdo->prepare("SELECT id FROM utilisateurs WHERE email = ?");
 $stmt->execute([$email]);
 
@@ -39,10 +39,10 @@ if ($stmt->rowCount() > 0) {
     exit;
 }
 
-// 🔷 Hash password
+//  Hash password
 $hashed_password = password_hash($pass, PASSWORD_DEFAULT);
 
-// 🔷 Insertion
+//  Insertion
 $stmt = $pdo->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe) VALUES (?, ?, ?)");
 $success = $stmt->execute([$nom, $email, $hashed_password]);
 

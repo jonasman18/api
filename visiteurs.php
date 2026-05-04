@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // 🔐 Vérification JWT — bloque si token absent ou invalide
 $authUser = requireAuth();
 
-// 🔥 CONNEXION RAILWAY
+//  CONNEXION RAILWAY
 $host     = 'maglev.proxy.rlwy.net';
 $port     = '18393';
 $dbname   = 'railway';

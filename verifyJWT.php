@@ -6,7 +6,7 @@ use Firebase\JWT\Key;
 
 function requireAuth(): array {
 
-    // ✅ Apache ne transmet pas toujours Authorization via getallheaders()
+    //  Apache ne transmet pas toujours Authorization via getallheaders()
     // On lit depuis $_SERVER directement
     $authHeader = '';
 
